@@ -41,10 +41,10 @@ export const load_spirit_js=async(trycnt)=>{
     let p=window.location.protocol
     let timestamp = new Date().getTime();
     var js;
-    if (p==='https') 
-        js=`https://127.0.0.1:${trycnt===1?'1':'0'}9443/js/spirit.js`
+    if (p==='https:') 
+        js=`https://127.0.0.1:${trycnt===1?'1':''}9443/js/spirit.js`
     else 
-        js=`http://127.0.0.1:${trycnt===1?'1':'0'}9011/js/spirit.js`
+        js=`http://127.0.0.1:${trycnt===1?'1':''}9011/js/spirit.js`
     js += `?t=${timestamp}`
     try {
 	    await loadjs(js)
