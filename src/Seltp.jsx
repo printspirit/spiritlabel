@@ -264,8 +264,9 @@ class Seltp extends React.Component {
 	        			</G.Col>
 	        		</G.Row> 
 	        		<div>
-		                {(sel_type==='shares' || is_local) && <LabelGallery key={'label-shares'} type="shares" search={search_key} onSelTp={this.do_seltp}/> }
-				        {sel_type==='mine' && <LabelGallery key={'label-mine'} type="mine" search={search_key} onSelTp={this.do_seltp} login={this.props.login} /> }
+		                {sel_type==='shares' && <LabelGallery key={'label-shares'} type="shares" search={search_key} onSelTp={this.do_seltp}/> }
+				        { sel_type==='mine' && <LabelGallery key={'label-mine'} type="mine" search={search_key} onSelTp={this.do_seltp} login={this.props.login} /> }
+				        { is_local && <LabelGallery key={'label-mine'} type="mine" search={search_key} onSelTp={this.do_seltp} /> }
             		</div>
                 </div>
                 :
