@@ -11,7 +11,7 @@ import "jsuites/dist/jsuites.css";
 import "./jssicon.css"
 import "./iconfont.css"
 
-var COPY_NAME = _("$打印份数")
+var COPIES_COL_NAME = _("$打印份数")
 
 const ManInput = 0
 const XLS = 1
@@ -65,7 +65,7 @@ function BindVar(props) {
 		    	</tr>
 		    )}
 		    <tr ><td>---</td></tr>
-		    { [COPY_NAME].map((v,idx)=>
+		    { [COPIES_COL_NAME].map((v,idx)=>
 		    	<tr key={idx}>
 		    		<td style={{padding:5}}>{v}</td>
 		    		<td><Select value={v in toBind?toBind[v]:""} onChange={setBindVars(v)} style={{width:100}}><option value=""></option>{columns.map((c,i)=><option key={i} value={i}>{c}</option>)}</Select></td>
@@ -103,7 +103,7 @@ export default class DataInput extends Component {
         var r1 = {};
         for (let col in bind_vars) {
           let key = bind_vars[col];
-          if (col === COPY_NAME) {
+          if (col === COPIES_COL_NAME) {
           	if (useCopies) r1["$copies"] = String(r[key] || "");
           } else {
             r1[col] = String(r[key] || "");
@@ -193,7 +193,7 @@ export default class DataInput extends Component {
   do_execl_handler = async (file) => {
     const reader = new FileReader();
     const rABS = !!reader.readAsBinaryString;
-    const { tpdata, onDataChange } = this.props;
+    const { tpdata, onUseCopies, onDataChange } = this.props;
 
     reader.onload = async (e) => {
       try {
@@ -220,7 +220,7 @@ export default class DataInput extends Component {
             bind_vars[i] = n;
           }
           if (n.length > 0 && (n === "$copies" || n === "$打印份数")) {
-            bind_vars[i] = COPY_NAME;
+            bind_vars[i] = COPIES_COL_NAME;
             has_copies = 1;
           }
         }
@@ -239,7 +239,7 @@ export default class DataInput extends Component {
 
           this.destroyAllSheet();
           this.setState({ dataType: ManInput})
-          this.props.onUseCopies(has_copies===1)
+          onUseCopies(has_copies===1)
           onDataChange(d);
         } else {
           if (this.state.dataType !== XLS) {
@@ -247,6 +247,7 @@ export default class DataInput extends Component {
             if (!yn) return;
           }
 
+          onUseCopies(false)
           onDataChange(data);
           this.setState({ bindVars:{}, dataType: XLS });
           this.destroyAllSheet();
@@ -350,6 +351,7 @@ export default class DataInput extends Component {
         }
       }
       this.setState({ bindVars: bv });
+      this.props.onUseCopies(h[COPIES_COL_NAME]?true:false)
       dlg.close();
     };
 
@@ -468,7 +470,7 @@ export default class DataInput extends Component {
 		  case ManInput:
 		    headers = JSON.parse(JSON.stringify(columns));
 		    if (useCopies) {
-		    	headers.push({ title: COPY_NAME, type: "numeric", tooltip: _("设置打印份数，缺省为0") });
+		    	headers.push({ title: COPIES_COL_NAME, type: "numeric", tooltip: _("设置打印份数，缺省为0") });
 		    }	
 		    break;
 		  case XLS:
