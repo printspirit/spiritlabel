@@ -183,7 +183,8 @@ class DoPrint extends React.Component {
 			</W.Dialog>
 		);
 		
-		let i=0;				
+		let i=0;
+		let printed=1;				
 		while(true) {
 		    let vars=getVars(i);
 		    if (vars===null) {
@@ -192,7 +193,7 @@ class DoPrint extends React.Component {
                 if (finish) finish()
 		        break;
 			}
-		    if (page) page.innerHTML=i+1;
+		    if (page) page.innerHTML=printed;
 			try {
 				await p.PrintLabel(tpid, vars);
 			}catch(e){
@@ -203,7 +204,8 @@ class DoPrint extends React.Component {
 			}
 			//await timewait();
 			if (cancel_print===true) break;
-			i++;
+			i++
+			printed+=(parseInt(vars["$copies"]||1)||1);
 		}
 	}
 	
@@ -424,9 +426,9 @@ class DoPrint extends React.Component {
 	
 	render() { 
 		
-		const {tpdata, rowcnt} = this.props
+		const {tpdata, data, rowcnt} = this.props
 		let var_cnt = tp_utils.get_var_cnt(tpdata.tp_vars)
-		let copys = var_cnt===0?1:rowcnt
+		//let copys = var_cnt===0?1:
 		
 		const fields=[
 			{name:_('打印机类型'),    id:'type',  type:'select', options:{
@@ -477,7 +479,7 @@ class DoPrint extends React.Component {
 		if (tpdata.tp_vars && var_cnt>0) {
 			/* 有变量模板，不能打印多张 */
 			var disable=['copys'];
-			this.props.print_opts['copys']=rowcnt;
+			this.props.print_opts['copys']=data.map(o=>(parseInt(o["$copies"] || 1) || 1)).reduce((acc, curr) => acc + curr, 0);;
 		}
 		
 		return (

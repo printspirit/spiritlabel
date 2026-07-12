@@ -12,7 +12,7 @@ class Finish extends React.Component {
     }
     
     printAnother=()=>{
-    	this.props.onDataChange([],[]);
+    	this.props.onResetAll();
     	this.props.history.push("/print-tools");
     }
     

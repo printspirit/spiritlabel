@@ -12,6 +12,7 @@ import {setLanguage, _} from "./locale.js";
 import {load_spirit_js} from "./load_spirit.js";
 import nologin_avt from './nologin_avt.svg';
 
+
 const DataInputJss = React.lazy(() => import('./DataInputJss.jsx'));
 const DoPrint = React.lazy(() => import( './DoPrint.jsx'));
 
@@ -60,6 +61,10 @@ export default class App extends React.Component {
 
 	setStep=(step)=>{
 		this.setState({step});
+	}
+	
+	onResetAll=()=>{
+		this.setState({tpdata:{}, data:[[]], rowcnt:0, columns:[]})
 	}
 
 	onSetData=(data, columns)=>{
@@ -217,7 +222,7 @@ export default class App extends React.Component {
 						/>} />
 					<Route path="/print-tools/finish"  render={props =><Finish {...props} 
 							setStep={this.setStep} 
-							onDataChange={this.onSetData}
+							onResetAll={this.onResetAll}
 						/>} />
 					</Suspense>
 				</Page>
