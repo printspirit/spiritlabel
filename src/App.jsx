@@ -30,10 +30,11 @@ export default class App extends React.Component {
 
 	state ={
 		step:"seltp", 
-		tpdata : {},
-		data:[[]],
-		rowcnt:0,
-		columns:[],
+		tpdata : {},            // 模板数据
+		data:[[]],              // 录入数据
+		rowcnt:0,               // 数据行
+		columns:[],             // 列
+		useCopies:false,        // 是否按行设置打印份数
 		print_opts:{type:'auto'}
 	}
 	
@@ -92,6 +93,16 @@ export default class App extends React.Component {
 		this.setState({print_opts})
 	}
 	
+	onUseCopies=(b)=>{
+		if (typeof b ==="undefined") {
+			this.setState(({useCopies}) => ({
+    		  useCopies: !useCopies
+    		}));
+    	}else{
+	    	this.setState({useCopies:b}) 
+    	}
+	}
+	
 	logout=()=>{
     	fetch('/api/logout')
 		.then((response)=>{
@@ -136,7 +147,7 @@ export default class App extends React.Component {
 	}
 		
 	render() {
-		const {tpdata, step, columns, data, rowcnt, sql, print_opts, NeedLogin, Userinfo}=this.state;
+		const {tpdata, step, columns, data, rowcnt, useCopies, sql, print_opts, NeedLogin, Userinfo}=this.state;
 		const isDesktop=window.SPIRIT?(window.SPIRIT.type==="desktop"?true:false):false
 		let lang=""
 		if (window.location.pathname.startsWith("/en/")) {
@@ -207,6 +218,8 @@ export default class App extends React.Component {
 							sql={sql}
 							rowcnt={rowcnt}
 							setStep={this.setStep} 
+							useCopies={useCopies}
+							onUseCopies={this.onUseCopies}
 							onDataChange={this.onSetData}
 							onSetSql={this.onSetSql}
 						/>}/>

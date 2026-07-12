@@ -87,7 +87,6 @@ export default class DataInput extends Component {
   state = {
     dataType: ManInput,
     bindVars: {},
-    useCopies: true
   };
 
   jssRef = createRef();
@@ -96,6 +95,7 @@ export default class DataInput extends Component {
   // 获取数据方法
   getData = (bind_vars) => {
     if (!sheet || !sheet[0]) return [];
+    let {useCopies}=this.props
     return sheet[0]
       .getData()
       .filter(r => r.some(c => c !== ""))
@@ -104,7 +104,7 @@ export default class DataInput extends Component {
         for (let col in bind_vars) {
           let key = bind_vars[col];
           if (col === COPY_NAME) {
-            r1["$copies"] = String(r[key] || "");
+          	if (useCopies) r1["$copies"] = String(r[key] || "");
           } else {
             r1[col] = String(r[key] || "");
           }
@@ -140,13 +140,13 @@ export default class DataInput extends Component {
 
   // 下一步
   nextStep = async () => {
-    const { sql, tpdata, rowcnt, onDataChange, onSetSql, history } = this.props;
+    const { sql, tpdata, rowcnt, useCopies, onDataChange, onSetSql, history } = this.props;
     const { dataType, bindVars } = this.state;
     var data;
-
+	let tp_vars1 = tpdata.tp_vars.filter(o => !o.startsWith("spirit."));
+      
     if (dataType === DB || dataType === XLS) {
       let vars = Object.entries(bindVars).filter(o => o[1] !== "").map(o => o[0]);
-      let tp_vars1 = tpdata.tp_vars.filter(o => !o.startsWith("spirit."));
       for (let i = 0; i < tp_vars1.length; i++) {
         let v = tp_vars1[i];
         if (vars.indexOf(v) < 0) {
@@ -159,7 +159,9 @@ export default class DataInput extends Component {
       let h = sheet[0].getHeaders(true);
       let bind_vars = {};
       for (let key in h) {
-        bind_vars[h[key]] = key;
+      	if (useCopies || tp_vars1.indexOf(h[key])>=0 ) {
+	        bind_vars[h[key]] = key;
+	    }    
       }
       data = this.getData(bind_vars);
     }
@@ -236,7 +238,8 @@ export default class DataInput extends Component {
           });
 
           this.destroyAllSheet();
-          this.setState({ dataType: ManInput });
+          this.setState({ dataType: ManInput})
+          this.props.onUseCopies(has_copies===1)
           onDataChange(d);
         } else {
           if (this.state.dataType !== XLS) {
@@ -368,7 +371,8 @@ export default class DataInput extends Component {
 
   // 设置使用份数
   set_use_copies = () => {
-    this.setState({ useCopies: true });
+  	this.props.onUseCopies()
+    this.destroyAllSheet();
   }
 
   // 重置数据
@@ -436,7 +440,7 @@ export default class DataInput extends Component {
   }
   
   render() {
-    const { columns, data } = this.props;
+    const { columns, data, useCopies } = this.props;
     const { dataType, bindVars } = this.state;
 
     // 创建工具栏
@@ -449,6 +453,7 @@ export default class DataInput extends Component {
       { content: fileBtn, title: _("加载EXCEL/CSV等格式的数据文件"), class: 'iconfont icon-Excel', onclick: this.load_excel },
       { content: `<span>${_("连接数据库")}</span>`, class: 'iconfont icon-database', title: _("连接数据库"), onclick: this.db_conn },
       { content: `<span>${_("变量绑定")}</span>`, class: 'iconfont icon-icon-customvar', title: _("设置字段和标签变量绑定关系"), onclick: this.var_binder },
+      { content: `<span>${_("打印份数")}</span>`, class: 'iconfont icon-copies', title: _("按行设置打印份数"), onclick: this.set_use_copies },
       { type: 'divisor' },
       { content: 'fullscreen', title: _("全屏编辑"), onclick: () => { if (sheet && sheet[0]) sheet[0].parent.fullscreen(); } },
     ];
@@ -462,7 +467,9 @@ export default class DataInput extends Component {
 		switch (dataType) {
 		  case ManInput:
 		    headers = JSON.parse(JSON.stringify(columns));
-		    headers.push({ title: COPY_NAME, type: "numeric", tooltip: _("设置打印份数，缺省为0") });
+		    if (useCopies) {
+		    	headers.push({ title: COPY_NAME, type: "numeric", tooltip: _("设置打印份数，缺省为0") });
+		    }	
 		    break;
 		  case XLS:
 		    headers = new Array(Math.max(...data.map(r => r.length))).fill(null);
