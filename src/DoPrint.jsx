@@ -54,7 +54,7 @@ class DoPrint extends React.Component {
 	print=()=>{
 		let {tpdata, data, print_opts}=this.props;
 		let {copys}=print_opts;
-		if (data.length===0 && copys==0) {
+		if (data.length===0 && copys===0) {
 		    W.alert(_("请设置打印数量"));
 		    return;
 		}
@@ -86,7 +86,7 @@ class DoPrint extends React.Component {
 	printAll=()=>{
 		let {tpdata, data, sql, print_opts}=this.props;
 		let {copys}=print_opts;
-		if (data.length===0 && copys==0) {
+		if (data.length===0 && copys===0) {
 		    W.alert(_("请设置打印数量"));
 		    return;
 		}
@@ -137,7 +137,7 @@ class DoPrint extends React.Component {
 			if (col==='auto') col=1
 			if (row==='auto') row=1
 						
-			if (print_dir==1) {
+			if (print_dir===1) {
     			size = [height*row + 10*gapY*row, width*col + 10*gapX*col]
 			}else{
     			size = [width*col + 10*gapX*col, height*row + 10*gapY*row]
@@ -193,19 +193,31 @@ class DoPrint extends React.Component {
                 if (finish) finish()
 		        break;
 			}
-		    if (page) page.innerHTML=printed;
-			try {
-				await p.PrintLabel(tpid, vars);
-			}catch(e){
-				p.close();
-                w.close();
-                W.alert(e);
-                break;
-			}
-			//await timewait();
-			if (cancel_print===true) break;
-			i++
-			printed+=(parseInt(vars["$copies"]||1)||1);
+		    
+		    let copies = 1
+		    if ('$copies' in vars) {
+		    	copies=parseInt(vars['$copies'])||1
+		    	delete vars['$copies']
+		    }
+		    
+		    for (let n=0; n<copies; n++) {
+		    
+		    	if (page) page.innerHTML=printed;
+		    
+				try {
+					await p.PrintLabel(tpid, vars);
+				}catch(e){
+					p.close();
+		            w.close();
+		            W.alert(e);
+		            break;
+				}
+				//await timewait();
+				if (cancel_print===true) break;
+				printed++
+			}	
+			i++;
+			// printed+=(parseInt(vars["$copies"]||1)||1);
 		}
 	}
 	
@@ -426,7 +438,7 @@ class DoPrint extends React.Component {
 	
 	render() { 
 		
-		const {tpdata, data, rowcnt} = this.props
+		const {tpdata, data} = this.props
 		let var_cnt = tp_utils.get_var_cnt(tpdata.tp_vars)
 		//let copys = var_cnt===0?1:
 		
