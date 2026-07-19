@@ -50,8 +50,8 @@ class Tabs extends React.Component {
 					<ul>{head}</ul>
 					{toolbar}
 				</div>
-				{!pages && 
-					<div style={{margin:'2px 0px'}}>{act_page && act_page.props.children}</div>
+				{!pages && act_page &&
+					<div style={{...act_page.props.style, margin:'2px 0px'}}>{act_page && act_page.props.children}</div>
 				}
 			</div>	
 		);

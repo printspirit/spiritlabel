@@ -19,6 +19,7 @@
       cursor: pointer; }
       .tab_hd > ul > li > div {
         padding: 6px 15px;
+        color:#555;
         margin-right: 2px;
         line-height: 1.42857;
         border: 1px solid transparent;
@@ -36,7 +37,8 @@
             z-index: 2; }
       .tab_hd > ul > li.on > div, .tab_hd > ul > li.on > div:hover, .tab_hd > ul > li.on > div:focus {
         padding: 6px 15px;
-        color: #555555;
+        color: #222;
+        font-weight:bold;
         background-color: #fff;
         border: 1px solid #ddd;
         border-bottom-color: transparent;

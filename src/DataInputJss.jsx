@@ -3,6 +3,7 @@ import { Spreadsheet, Worksheet, jspreadsheet } from "@jspreadsheet-ce/react";
 import { Button, Select, DivWin as W, Toolbar} from 'ecp';
 import css from './ecp_react/input.module.scss'
 import DBConn from './DBConn.jsx'
+import BitableConn from './BitableConn.jsx'
 import {_} from "./locale.js";
 
 import "jspreadsheet-ce/dist/jspreadsheet.css";
@@ -297,6 +298,45 @@ export default class DataInput extends Component {
     this.setState({ dataType: DB, bindVars: bind_vars });
     return true;
   }
+  
+  setData = (data) =>{
+  	 const {onUseCopies, onDataChange } = this.props;
+  	 this.destroyAllSheet();
+     this.setState({ dataType: ManInput})
+     onUseCopies(true)
+     onDataChange(data);
+     return true
+  }
+  
+  // 数据库连接
+  bitable_conn = () => {
+    /*if (typeof window.SPIRIT.BitableQueryList !== "function") {
+      W.alert(
+        <>
+          <div>{_("打印插件版本太低,需要升级")}</div>
+          <div><a href="/download/spirit-web-setup.exe">立即下载安装</a></div>
+        </>
+      );
+      return;
+    }*/
+    
+    const { tpdata} = this.props;
+    let tp_vars = [
+      ...(tpdata.tp_vars ? tpdata.tp_vars.filter(o => !o.startsWith("spirit.")) : [])
+    ];
+    
+    W.show(
+      <W.Dialog
+        title={_("连接多维表格数据源")}
+        width="800"
+        height="500"
+        btn_CANCEL
+        onSubmit={(form) => { form.close(); }}
+      >
+        <BitableConn setData={this.setData} tp_vars={tp_vars} />
+      </W.Dialog>
+    );
+  }
 
   // 数据库连接
   db_conn = () => {
@@ -453,6 +493,7 @@ export default class DataInput extends Component {
       { content: 'autorenew', title: _("清除数据"), onclick: this.resetData },
       { type: 'divisor' },
       { content: fileBtn, title: _("加载EXCEL/CSV等格式的数据文件"), class: 'iconfont icon-Excel', onclick: this.load_excel },
+      { content: `<span>${_("多维表格")}</span>`, class: 'iconfont icon-bitable', title: _("加载多维表格"), onclick: this.bitable_conn },
       { content: `<span>${_("连接数据库")}</span>`, class: 'iconfont icon-database', title: _("连接数据库"), onclick: this.db_conn },
       { content: `<span>${_("变量绑定")}</span>`, class: 'iconfont icon-icon-customvar', title: _("设置字段和标签变量绑定关系"), onclick: this.var_binder },
       { content: `<span>${_("打印份数")}</span>`, class: 'iconfont icon-copies', title: _("按行设置打印份数"), onclick: this.set_use_copies },
@@ -470,7 +511,7 @@ export default class DataInput extends Component {
 		  case ManInput:
 		    headers = JSON.parse(JSON.stringify(columns));
 		    if (useCopies) {
-		    	headers.push({ title: COPIES_COL_NAME, type: "numeric", tooltip: _("设置打印份数，缺省为0") });
+		    	headers.push({ title: COPIES_COL_NAME, name: COPIES_COL_NAME, type: "numeric", tooltip: _("设置打印份数，缺省为0") });
 		    }	
 		    break;
 		  case XLS:

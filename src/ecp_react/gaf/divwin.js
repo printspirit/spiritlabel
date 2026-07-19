@@ -128,8 +128,11 @@ var divWin=function(myobj, param) {
 }
 
 divWin.prototype.showMask=function() {
+	if (!this.modal) {
+		return;
+	}
 	
-	if (this.modal && !this.$('dialog-mask')) {
+	if (!this.$('dialog-mask')) {
 		let dw_mask=this.topWin.document.createElement("div");
 		dw_mask.id="dialog-mask";
 		dw_mask.className=css["dialog-mask"];
