@@ -23,7 +23,7 @@ class Finish extends React.Component {
     	   <div className="center">
 	      	<H1>打印结束</H1>
 	      	<br/>
-	      	{ ["Spirit Image", "Microsoft Print to PDF", "Microsoft XPS Document Writer"].some(p=>printer.startsWith(p)) && 
+	      	{ ["Spirit PDF", "Spirit Image", "Microsoft Print to PDF", "Microsoft XPS Document Writer"].some(p=>printer.startsWith(p)) && 
 	      	  <div className="print-result">请到<span>{dir}</span>查看打印结果</div>}
 	      	<Button type="green" onClick={this.printAnother}>继续打印</Button>
     	   </div>

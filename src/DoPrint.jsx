@@ -137,7 +137,7 @@ class DoPrint extends React.Component {
 			if (col==='auto') col=1
 			if (row==='auto') row=1
 						
-			if (print_dir===1) {
+			if (print_dir==='1' || print_dir==='3') {
     			size = [height*row + 10*gapY*row, width*col + 10*gapX*col]
 			}else{
     			size = [width*col + 10*gapX*col, height*row + 10*gapY*row]
@@ -172,7 +172,7 @@ class DoPrint extends React.Component {
 	    }
 	
 		let w=W.show(
-			<W.Dialog title={_("打印中")} height="400">
+			<W.Dialog title={_("打印中")} height="400" onClose={e=>{cancel_print=true; return true}}>
 				<G.Row className="print-dlg">
 					<G.Col style={{margin:"0 auto", width:380, textAlign:"center"}}>
 						<H1 >{_("正在打印第")}<span ref={e=>page=e} ></span>{_("张标签")}</H1>
@@ -184,8 +184,9 @@ class DoPrint extends React.Component {
 		);
 		
 		let i=0;
-		let printed=1;				
-		while(true) {
+		let printed=1;	
+		let running=true			
+		while(running) {
 		    let vars=getVars(i);
 		    if (vars===null) {
                 p.close();
@@ -213,11 +214,16 @@ class DoPrint extends React.Component {
 		            break;
 				}
 				//await timewait();
-				if (cancel_print===true) break;
+				if (cancel_print===true) {
+					p.close();
+		            w.close();
+		            W.alert("用户中断");
+		            running=false
+					break;
+				}
 				printed++
 			}	
 			i++;
-			// printed+=(parseInt(vars["$copies"]||1)||1);
 		}
 	}
 	
@@ -455,7 +461,7 @@ class DoPrint extends React.Component {
 			},
 			{name:_('打印机'),       id:'name',   type:'select', options:[] },
 			{name:_('纸张'),         id:'size',   type:'select', options:{} , def:"auto" },
-			{name:_('标签方向'),     id:'print_dir',    type:'select', options:{'0':_('正常'), '1':_('旋转90度')}, def:'0'},
+			{name:_('标签方向'),     id:'print_dir',    type:'select', options:{'0':_('正常'), '1':_('旋转90度'), '2':_('旋转180度'), '3':_('旋转270度')}, def:'0'},
 			{name:_('缩放'),         id:'fill',   type:'select', options:{}, def:'0'},
 			{name:_('打印质量'),     id:'quality',type:'select', options:{'0':_('高速'), '1':_('平衡'), '2':_('高质量')}, def:'2'},
 			{name:_('每行标签列数'), id:'col',    type:'select', options:{'auto':_('自动'), '1':1, 2:2, 3:3, 4:4, 5:5, 6:6,7:7,8:8,9:9,10:10}, def:'auto'},
